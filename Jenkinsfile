@@ -1,20 +1,28 @@
 pipeline {
-    agent any 
-    stages {
-        stage('Build') { 
-            steps {
-                echo "build project1 test push event" 
-            }
-        }
-        stage('Test') { 
-            steps {
-                echo "test project1 test push event" 
-            }
-        }
-        stage('Deploy') { 
-            steps {
-                 echo "Deploy project1"  
-            }
-        }
+  agent any 
+  options {
+    skipDefaultCheckout(true)
+  }
+  stages{
+    stage('clean workspace') {
+      steps {
+        cleanWs()
+      }
     }
+    stage('checkout') {
+      steps {
+        checkout scm
+      }
+    }
+    stage('terraform') {
+      steps {
+        sh './terraform apply --auto-approve'
+      }
+    }
+  }
+  post {
+    always {
+      cleanWs()
+    }
+  }
 }
